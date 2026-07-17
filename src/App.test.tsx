@@ -96,4 +96,16 @@ describe('Spectre', () => {
     fireEvent.change(screen.getByLabelText('Hintergrundfarbe'), { target: { value: '#d7c8aa' } })
     expect(screen.getByRole('main').style.getPropertyValue('--app-background')).toBe('#d7c8aa')
   })
+
+  it('keeps automatic text readable across dark backgrounds and glass tints', async () => {
+    const user = userEvent.setup()
+    render(<App />)
+    await screen.findByRole('heading', { name: 'Jetzt erledigen' })
+    await user.click(screen.getByRole('button', { name: 'Einstellungen' }))
+    fireEvent.change(screen.getByLabelText('Grundfarbe'), { target: { value: '#111318' } })
+    fireEvent.change(screen.getByLabelText('Glastönung'), { target: { value: '#080a0f' } })
+    const main = screen.getByRole('main')
+    expect(main.style.getPropertyValue('--auto-page-ink')).toBe('#f7f8fb')
+    expect(main.style.getPropertyValue('--auto-surface-ink')).toBe('#f7f8fb')
+  })
 })

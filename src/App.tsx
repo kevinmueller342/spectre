@@ -28,6 +28,14 @@ function normalizeOrders(tasks: Task[]): Task[] {
     .map((task, order) => ({ ...task, order })))
 }
 
+function readableInk(hex: string) {
+  const channels = hexToRgb(hex).split(',').map((value) => Number(value.trim()) / 255)
+  const luminance = channels
+    .map((value) => value <= .04045 ? value / 12.92 : ((value + .055) / 1.055) ** 2.4)
+    .reduce((sum, value, index) => sum + value * [0.2126, 0.7152, 0.0722][index], 0)
+  return (luminance + .05) / .05 >= 1.05 / (luminance + .05) ? '#15181d' : '#f7f8fb'
+}
+
 function TaskCard({ task, copy, onComplete, onDelete, onEdit, onMove, overlay = false }: {
   task: Task; copy: Copy; onComplete: () => void; onDelete: () => void
   onEdit: (title: string) => void; onMove: (quadrant: QuadrantId) => void; overlay?: boolean
@@ -261,14 +269,21 @@ export default function App() {
   const background = settings.backgroundPreset === 'custom' && settings.customBackground
     ? `url(${settings.customBackground}) center / cover`
     : settings.backgroundPreset === 'palette' ? (settings.backgroundMode === 'solid' ? settings.backgroundSolidColor : paletteBackground) : BACKGROUNDS[settings.backgroundPreset as keyof typeof BACKGROUNDS] || BACKGROUNDS.aurora
+  const presetBaseColors = { aurora: '#d9d9d2', linen: '#d8c9c1', dusk: '#777a91', bloom: '#d7e1d4', midnight: '#151923' }
+  const backgroundBaseColor = settings.backgroundPreset === 'palette'
+    ? (settings.backgroundMode === 'solid' ? settings.backgroundSolidColor : settings.backgroundColorA)
+    : presetBaseColors[settings.backgroundPreset as keyof typeof presetBaseColors]
+  const pageInk = settings.backgroundPreset === 'custom' ? '#f7f8fb' : readableInk(backgroundBaseColor || '#d9d9d2')
+  const surfaceInk = readableInk(settings.glassTint)
   const transparency = (100 - settings.glassOpacity) / 100
   const reflection = settings.glassReflection / 100
   const style = {
     '--app-background': background, '--glass-rgb': hexToRgb(settings.glassTint),
     '--glass-opacity': settings.glassOpacity / 100, '--glass-blur': `${settings.glassBlur}px`,
     '--glass-transparency': transparency, '--glass-refraction': reflection,
-    '--glass-edge-opacity': 0.24 + reflection * 0.42, '--glass-glow-opacity': 0.01 + reflection * 0.07,
-    '--glass-saturation': `${82 + reflection * 18}%`, '--glass-shadow-size': `${12 + reflection * 12}px`,
+    '--glass-edge-opacity': 0.28 + reflection * 0.45, '--glass-glow-opacity': 0.025 + reflection * 0.16,
+    '--glass-saturation': `${88 + reflection * 16}%`, '--glass-shadow-size': `${14 + reflection * 16}px`,
+    '--auto-page-ink': pageInk, '--auto-surface-ink': surfaceInk,
     ...(settings.textColor ? { '--user-ink': settings.textColor } : {})
   } as React.CSSProperties
 
