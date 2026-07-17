@@ -86,4 +86,14 @@ describe('Spectre', () => {
     expect(background).toContain('#44aacc')
     expect(background).toContain('#bb3366')
   })
+
+  it('supports a flat background color without a gradient', async () => {
+    const user = userEvent.setup()
+    render(<App />)
+    await screen.findByRole('heading', { name: 'Jetzt erledigen' })
+    await user.click(screen.getByRole('button', { name: 'Einstellungen' }))
+    await user.click(screen.getByRole('button', { name: 'Einfarbig' }))
+    fireEvent.change(screen.getByLabelText('Hintergrundfarbe'), { target: { value: '#d7c8aa' } })
+    expect(screen.getByRole('main').style.getPropertyValue('--app-background')).toBe('#d7c8aa')
+  })
 })

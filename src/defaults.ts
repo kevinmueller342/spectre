@@ -7,6 +7,8 @@ export const DEFAULT_SETTINGS: Settings = {
   showAppName: true,
   mobileLayout: 'stack',
   backgroundPreset: 'aurora',
+  backgroundMode: 'gradient',
+  backgroundSolidColor: '#e8eaed',
   backgroundColorA: '#141922',
   backgroundColorB: '#083f59',
   backgroundColorC: '#6a1e4f',

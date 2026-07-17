@@ -14,6 +14,7 @@ export type Language = 'de' | 'en'
 export type Theme = 'system' | 'light' | 'dark'
 export type MobileLayout = 'stack' | 'focus' | 'grid'
 export type BackgroundPreset = 'aurora' | 'linen' | 'dusk' | 'bloom' | 'midnight' | 'palette' | 'custom'
+export type BackgroundMode = 'gradient' | 'solid'
 
 export type Settings = {
   language: Language
@@ -22,7 +23,9 @@ export type Settings = {
   showAppName: boolean
   mobileLayout: MobileLayout
   backgroundPreset: BackgroundPreset
+  backgroundMode: BackgroundMode
   customBackground?: string
+  backgroundSolidColor: string
   backgroundColorA: string
   backgroundColorB: string
   backgroundColorC: string
