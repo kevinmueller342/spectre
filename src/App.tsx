@@ -281,8 +281,8 @@ export default function App() {
     '--app-background': background, '--glass-rgb': hexToRgb(settings.glassTint),
     '--glass-opacity': settings.glassOpacity / 100, '--glass-blur': `${settings.glassBlur}px`,
     '--glass-transparency': transparency, '--glass-refraction': reflection,
-    '--glass-edge-opacity': 0.28 + reflection * 0.45, '--glass-glow-opacity': 0.025 + reflection * 0.16,
-    '--glass-saturation': `${88 + reflection * 16}%`, '--glass-shadow-size': `${14 + reflection * 16}px`,
+    '--glass-edge-opacity': 0.36 + reflection * 0.38, '--glass-glow-opacity': 0.006 + reflection * 0.028,
+    '--glass-saturation': `${100 + reflection * 20}%`, '--glass-shadow-size': `${16 + reflection * 18}px`,
     '--auto-page-ink': pageInk, '--auto-surface-ink': surfaceInk,
     ...(settings.textColor ? { '--user-ink': settings.textColor } : {})
   } as React.CSSProperties
