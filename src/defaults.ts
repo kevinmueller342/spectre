@@ -7,8 +7,12 @@ export const DEFAULT_SETTINGS: Settings = {
   showAppName: true,
   mobileLayout: 'stack',
   backgroundPreset: 'aurora',
+  backgroundColorA: '#141922',
+  backgroundColorB: '#083f59',
+  backgroundColorC: '#6a1e4f',
   glassOpacity: 34,
   glassBlur: 22,
+  glassReflection: 82,
   glassTint: '#ffffff',
   textColor: null
 }

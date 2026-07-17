@@ -12,7 +12,7 @@ import {
 import { BACKGROUNDS, DEFAULT_SETTINGS, hexToRgb } from './defaults'
 import { getCopy, type Copy } from './i18n'
 import { loadAppData, putSettings, putTasks, removeTask, resizeImage } from './storage'
-import { QUADRANTS, type BackgroundPreset, type QuadrantId, type Settings, type Task } from './types'
+import { QUADRANTS, type QuadrantId, type Settings, type Task } from './types'
 
 type Removed = { task: Task; label: string }
 
@@ -126,7 +126,9 @@ function AddDialog({ copy, initial, onClose, onAdd }: { copy: Copy; initial: Qua
   const [title, setTitle] = useState('')
   const [quadrant, setQuadrant] = useState(initial)
   const inputRef = useRef<HTMLInputElement>(null)
-  useEffect(() => inputRef.current?.focus(), [])
+  useEffect(() => {
+    if (window.matchMedia('(pointer: fine)').matches) inputRef.current?.focus()
+  }, [])
   const submit = () => { const value = title.trim().slice(0, 160); if (value) { onAdd(value, quadrant); onClose() } }
   return (
     <div className="modal-backdrop" onMouseDown={(event) => { if (event.target === event.currentTarget) onClose() }}>
@@ -150,6 +152,7 @@ function Segmented<T extends string>({ value, options, onChange }: { value: T; o
 
 function SettingsPanel({ settings, copy, onChange, onClose }: { settings: Settings; copy: Copy; onChange: (next: Settings) => void; onClose: () => void }) {
   const update = <K extends keyof Settings>(key: K, value: Settings[K]) => onChange({ ...settings, [key]: value })
+  const updatePalette = (key: 'backgroundColorA' | 'backgroundColorB' | 'backgroundColorC', value: string) => onChange({ ...settings, backgroundPreset: 'palette', [key]: value })
   const fileRef = useRef<HTMLInputElement>(null)
   const upload = async (file?: File) => {
     if (!file) return
@@ -170,14 +173,25 @@ function SettingsPanel({ settings, copy, onChange, onClose }: { settings: Settin
           </section>
           <section className="settings-section"><h3>{copy.background}</h3>
             <div className="background-grid">
-              {(Object.keys(BACKGROUNDS) as Exclude<BackgroundPreset, 'custom'>[]).map((id) => <button key={id} aria-label={id} className={settings.backgroundPreset === id ? 'selected' : ''} style={{ background: BACKGROUNDS[id] }} onClick={() => update('backgroundPreset', id)} />)}
+              {(Object.keys(BACKGROUNDS) as (keyof typeof BACKGROUNDS)[]).map((id) => <button key={id} aria-label={id} className={settings.backgroundPreset === id ? 'selected' : ''} style={{ background: BACKGROUNDS[id] }} onClick={() => update('backgroundPreset', id)} />)}
               <button className={`upload-background${settings.backgroundPreset === 'custom' ? ' selected' : ''}`} style={settings.customBackground ? { backgroundImage: `url(${settings.customBackground})` } : undefined} onClick={() => fileRef.current?.click()}><ImagePlus size={20} /><span>{copy.ownImage}</span></button>
               <input ref={fileRef} type="file" accept="image/*" hidden onChange={(event) => upload(event.target.files?.[0])} />
             </div>
+            <div className={`palette-editor${settings.backgroundPreset === 'palette' ? ' selected' : ''}`}>
+              <button className="palette-preview" style={{ background: `radial-gradient(circle at 18% 12%, ${settings.backgroundColorB}, transparent 45%), radial-gradient(circle at 82% 82%, ${settings.backgroundColorC}, transparent 48%), ${settings.backgroundColorA}` }} onClick={() => update('backgroundPreset', 'palette')}>
+                <span>{copy.customColors}</span>
+              </button>
+              <div className="palette-colors">
+                <label><span>{copy.colorOne}</span><input aria-label={copy.colorOne} type="color" value={settings.backgroundColorA} onChange={(event) => updatePalette('backgroundColorA', event.target.value)} /></label>
+                <label><span>{copy.colorTwo}</span><input aria-label={copy.colorTwo} type="color" value={settings.backgroundColorB} onChange={(event) => updatePalette('backgroundColorB', event.target.value)} /></label>
+                <label><span>{copy.colorThree}</span><input aria-label={copy.colorThree} type="color" value={settings.backgroundColorC} onChange={(event) => updatePalette('backgroundColorC', event.target.value)} /></label>
+              </div>
+            </div>
           </section>
           <section className="settings-section"><h3>{copy.glass}</h3>
-            <label className="range-field"><span>{copy.transparency}<b>{100 - settings.glassOpacity}%</b></span><input type="range" min="18" max="80" value={100 - settings.glassOpacity} onChange={(event) => update('glassOpacity', 100 - Number(event.target.value))} /></label>
+            <label className="range-field"><span>{copy.transparency}<b>{100 - settings.glassOpacity}%</b></span><input aria-label={copy.transparency} type="range" min="10" max="90" value={100 - settings.glassOpacity} onChange={(event) => update('glassOpacity', 100 - Number(event.target.value))} /></label>
             <label className="range-field"><span>{copy.blur}<b>{settings.glassBlur}px</b></span><input type="range" min="6" max="42" value={settings.glassBlur} onChange={(event) => update('glassBlur', Number(event.target.value))} /></label>
+            <label className="range-field"><span>{copy.reflection}<b>{settings.glassReflection}%</b></span><input aria-label={copy.reflection} type="range" min="0" max="100" value={settings.glassReflection} onChange={(event) => update('glassReflection', Number(event.target.value))} /></label>
             <label className="color-field"><span>{copy.tint}</span><input type="color" value={settings.glassTint} onChange={(event) => update('glassTint', event.target.value)} /></label>
             <div className="color-field"><span>{copy.textColor}</span><div className="color-actions"><button className={!settings.textColor ? 'active' : ''} onClick={() => update('textColor', null)}>{copy.automatic}</button><input aria-label={copy.textColor} type="color" value={settings.textColor ?? (settings.theme === 'dark' ? '#f5f4f1' : '#171918')} onChange={(event) => update('textColor', event.target.value)} /></div></div>
           </section>
@@ -201,7 +215,11 @@ export default function App() {
   const copy = getCopy(settings.language)
 
   useEffect(() => { loadAppData().then((data) => { setTasks(normalizeOrders(data.tasks)); setSettings(data.settings); setReady(true) }) }, [])
-  useEffect(() => { if (!ready) return; void putSettings(settings) }, [settings, ready])
+  useEffect(() => {
+    if (!ready) return
+    const timer = window.setTimeout(() => { void putSettings(settings) }, 140)
+    return () => window.clearTimeout(timer)
+  }, [settings, ready])
   useEffect(() => {
     const systemDark = window.matchMedia('(prefers-color-scheme: dark)')
     const apply = () => document.documentElement.dataset.theme = settings.theme === 'system' ? (systemDark.matches ? 'dark' : 'light') : settings.theme
@@ -226,15 +244,29 @@ export default function App() {
     return () => URL.revokeObjectURL(url)
   }, [settings, ready])
 
+  useEffect(() => {
+    if (!settingsOpen && !addOpen) return
+    const previous = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+    return () => { document.body.style.overflow = previous }
+  }, [settingsOpen, addOpen])
+
+  useEffect(() => () => window.clearTimeout(undoTimer.current), [])
+
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 6 } }), useSensor(TouchSensor, { activationConstraint: { delay: 180, tolerance: 8 } }), useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }))
   const sorted = useMemo(() => normalizeOrders(tasks), [tasks])
-  const background = settings.backgroundPreset === 'custom' && settings.customBackground ? `url(${settings.customBackground}) center / cover` : BACKGROUNDS[settings.backgroundPreset as keyof typeof BACKGROUNDS] || BACKGROUNDS.aurora
+  const paletteBackground = `radial-gradient(circle at 15% 8%, ${settings.backgroundColorB} 0, transparent 43%), radial-gradient(circle at 88% 86%, ${settings.backgroundColorC} 0, transparent 48%), linear-gradient(145deg, ${settings.backgroundColorA}, ${settings.backgroundColorA})`
+  const background = settings.backgroundPreset === 'custom' && settings.customBackground
+    ? `url(${settings.customBackground}) center / cover`
+    : settings.backgroundPreset === 'palette' ? paletteBackground : BACKGROUNDS[settings.backgroundPreset as keyof typeof BACKGROUNDS] || BACKGROUNDS.aurora
   const transparency = (100 - settings.glassOpacity) / 100
+  const reflection = settings.glassReflection / 100
   const style = {
     '--app-background': background, '--glass-rgb': hexToRgb(settings.glassTint),
     '--glass-opacity': settings.glassOpacity / 100, '--glass-blur': `${settings.glassBlur}px`,
-    '--glass-refraction': transparency, '--glass-edge-opacity': 0.34 + transparency * 0.62,
-    '--glass-saturation': `${140 + transparency * 85}%`, '--glass-shadow-size': `${10 + transparency * 18}px`,
+    '--glass-transparency': transparency, '--glass-refraction': reflection,
+    '--glass-edge-opacity': 0.18 + reflection * 0.78, '--glass-glow-opacity': 0.02 + reflection * 0.22,
+    '--glass-saturation': `${120 + reflection * 110}%`, '--glass-shadow-size': `${10 + reflection * 22}px`,
     ...(settings.textColor ? { '--user-ink': settings.textColor } : {})
   } as React.CSSProperties
 

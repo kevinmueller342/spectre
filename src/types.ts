@@ -13,7 +13,7 @@ export type Task = {
 export type Language = 'de' | 'en'
 export type Theme = 'system' | 'light' | 'dark'
 export type MobileLayout = 'stack' | 'focus' | 'grid'
-export type BackgroundPreset = 'aurora' | 'linen' | 'dusk' | 'bloom' | 'midnight' | 'custom'
+export type BackgroundPreset = 'aurora' | 'linen' | 'dusk' | 'bloom' | 'midnight' | 'palette' | 'custom'
 
 export type Settings = {
   language: Language
@@ -23,8 +23,12 @@ export type Settings = {
   mobileLayout: MobileLayout
   backgroundPreset: BackgroundPreset
   customBackground?: string
+  backgroundColorA: string
+  backgroundColorB: string
+  backgroundColorC: string
   glassOpacity: number
   glassBlur: number
+  glassReflection: number
   glassTint: string
   textColor: string | null
 }
