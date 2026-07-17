@@ -26,4 +26,5 @@ export type Settings = {
   glassOpacity: number
   glassBlur: number
   glassTint: string
+  textColor: string | null
 }

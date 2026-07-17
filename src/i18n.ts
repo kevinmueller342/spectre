@@ -9,7 +9,7 @@ const messages = {
     appearance: 'Erscheinungsbild', general: 'Allgemein', appName: 'App-Name', showName: 'Namen anzeigen', language: 'Sprache',
     theme: 'Farbschema', system: 'System', light: 'Hell', dark: 'Dunkel', mobileLayout: 'Handy-Layout',
     stack: 'Untereinander', focus: 'Fokus', grid: '2 × 2', background: 'Hintergrund', ownImage: 'Eigenes Bild',
-    glass: 'Glas', transparency: 'Transparenz', blur: 'Unschärfe', tint: 'Tönung', reset: 'Standard wiederherstellen',
+    glass: 'Glas & Schrift', transparency: 'Transparenz', blur: 'Unschärfe', tint: 'Glastönung', textColor: 'Schriftfarbe', automatic: 'Auto', reset: 'Standard wiederherstellen',
     resetConfirm: 'Alle Design-Einstellungen zurücksetzen?', titleLimit: 'Maximal 160 Zeichen', uploadError: 'Das Bild konnte nicht verarbeitet werden.',
     quadrants: {
       do: ['Jetzt erledigen', 'Wichtig · Dringend'], schedule: ['Einplanen', 'Wichtig · Nicht dringend'],
@@ -24,7 +24,7 @@ const messages = {
     appearance: 'Appearance', general: 'General', appName: 'App name', showName: 'Show name', language: 'Language',
     theme: 'Color scheme', system: 'System', light: 'Light', dark: 'Dark', mobileLayout: 'Phone layout',
     stack: 'Stacked', focus: 'Focus', grid: '2 × 2', background: 'Background', ownImage: 'Own image',
-    glass: 'Glass', transparency: 'Transparency', blur: 'Blur', tint: 'Tint', reset: 'Restore defaults',
+    glass: 'Glass & type', transparency: 'Transparency', blur: 'Blur', tint: 'Glass tint', textColor: 'Text color', automatic: 'Auto', reset: 'Restore defaults',
     resetConfirm: 'Reset all appearance settings?', titleLimit: 'Maximum 160 characters', uploadError: 'The image could not be processed.',
     quadrants: {
       do: ['Do now', 'Important · Urgent'], schedule: ['Schedule', 'Important · Not urgent'],

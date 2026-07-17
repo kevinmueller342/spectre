@@ -1,4 +1,4 @@
-import { render, screen, within } from '@testing-library/react'
+import { fireEvent, render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it } from 'vitest'
 import App from './App'
@@ -50,5 +50,14 @@ describe('Spectre', () => {
     expect(screen.queryByText('Wichtige Aufgabe')).not.toBeInTheDocument()
     await user.click(screen.getByRole('button', { name: 'Rückgängig' }))
     expect(screen.getByText('Wichtige Aufgabe')).toBeVisible()
+  })
+
+  it('applies a custom text color from appearance settings', async () => {
+    const user = userEvent.setup()
+    render(<App />)
+    await screen.findByRole('heading', { name: 'Jetzt erledigen' })
+    await user.click(screen.getByRole('button', { name: 'Einstellungen' }))
+    fireEvent.change(screen.getByLabelText('Schriftfarbe'), { target: { value: '#174a6b' } })
+    expect(screen.getByRole('main')).toHaveStyle({ '--user-ink': '#174a6b' })
   })
 })

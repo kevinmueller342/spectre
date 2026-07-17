@@ -176,9 +176,10 @@ function SettingsPanel({ settings, copy, onChange, onClose }: { settings: Settin
             </div>
           </section>
           <section className="settings-section"><h3>{copy.glass}</h3>
-            <label className="range-field"><span>{copy.transparency}<b>{settings.glassOpacity}%</b></span><input type="range" min="20" max="82" value={settings.glassOpacity} onChange={(event) => update('glassOpacity', Number(event.target.value))} /></label>
+            <label className="range-field"><span>{copy.transparency}<b>{100 - settings.glassOpacity}%</b></span><input type="range" min="18" max="80" value={100 - settings.glassOpacity} onChange={(event) => update('glassOpacity', 100 - Number(event.target.value))} /></label>
             <label className="range-field"><span>{copy.blur}<b>{settings.glassBlur}px</b></span><input type="range" min="6" max="42" value={settings.glassBlur} onChange={(event) => update('glassBlur', Number(event.target.value))} /></label>
             <label className="color-field"><span>{copy.tint}</span><input type="color" value={settings.glassTint} onChange={(event) => update('glassTint', event.target.value)} /></label>
+            <div className="color-field"><span>{copy.textColor}</span><div className="color-actions"><button className={!settings.textColor ? 'active' : ''} onClick={() => update('textColor', null)}>{copy.automatic}</button><input aria-label={copy.textColor} type="color" value={settings.textColor ?? (settings.theme === 'dark' ? '#f5f4f1' : '#171918')} onChange={(event) => update('textColor', event.target.value)} /></div></div>
           </section>
           <button className="reset-button" onClick={() => { if (window.confirm(copy.resetConfirm)) onChange({ ...DEFAULT_SETTINGS, language: settings.language }) }}><RotateCcw size={16} />{copy.reset}</button>
         </div>
@@ -228,9 +229,13 @@ export default function App() {
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 6 } }), useSensor(TouchSensor, { activationConstraint: { delay: 180, tolerance: 8 } }), useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }))
   const sorted = useMemo(() => normalizeOrders(tasks), [tasks])
   const background = settings.backgroundPreset === 'custom' && settings.customBackground ? `url(${settings.customBackground}) center / cover` : BACKGROUNDS[settings.backgroundPreset as keyof typeof BACKGROUNDS] || BACKGROUNDS.aurora
+  const transparency = (100 - settings.glassOpacity) / 100
   const style = {
     '--app-background': background, '--glass-rgb': hexToRgb(settings.glassTint),
-    '--glass-opacity': settings.glassOpacity / 100, '--glass-blur': `${settings.glassBlur}px`
+    '--glass-opacity': settings.glassOpacity / 100, '--glass-blur': `${settings.glassBlur}px`,
+    '--glass-refraction': transparency, '--glass-edge-opacity': 0.34 + transparency * 0.62,
+    '--glass-saturation': `${140 + transparency * 85}%`, '--glass-shadow-size': `${10 + transparency * 18}px`,
+    ...(settings.textColor ? { '--user-ink': settings.textColor } : {})
   } as React.CSSProperties
 
   const persist = (next: Task[]) => { const normalized = normalizeOrders(next); setTasks(normalized); void putTasks(normalized) }
