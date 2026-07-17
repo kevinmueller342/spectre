@@ -175,7 +175,7 @@ function SettingsPanel({ settings, copy, onChange, onClose }: { settings: Settin
           <section className="settings-section"><h3>{copy.background}</h3>
             <div className="background-grid">
               {(Object.keys(BACKGROUNDS) as (keyof typeof BACKGROUNDS)[]).map((id) => <button key={id} aria-label={id} className={settings.backgroundPreset === id ? 'selected' : ''} style={{ background: BACKGROUNDS[id] }} onClick={() => update('backgroundPreset', id)} />)}
-              <button className={`upload-background${settings.backgroundPreset === 'custom' ? ' selected' : ''}`} style={settings.customBackground ? { backgroundImage: `url(${settings.customBackground})` } : undefined} onClick={() => fileRef.current?.click()}><ImagePlus size={20} /><span>{copy.ownImage}</span></button>
+              <button className={`upload-background${settings.backgroundPreset === 'custom' ? ' selected' : ''}`} style={settings.customBackground ? { backgroundImage: `url(${settings.customBackground})` } : undefined} onClick={() => settings.customBackground && settings.backgroundPreset !== 'custom' ? update('backgroundPreset', 'custom') : fileRef.current?.click()}><ImagePlus size={20} /><span>{copy.ownImage}</span></button>
               <input ref={fileRef} type="file" accept="image/*" hidden onChange={(event) => upload(event.target.files?.[0])} />
             </div>
             <div className={`palette-editor${settings.backgroundPreset === 'palette' ? ' selected' : ''}`}>
@@ -267,8 +267,8 @@ export default function App() {
     '--app-background': background, '--glass-rgb': hexToRgb(settings.glassTint),
     '--glass-opacity': settings.glassOpacity / 100, '--glass-blur': `${settings.glassBlur}px`,
     '--glass-transparency': transparency, '--glass-refraction': reflection,
-    '--glass-edge-opacity': 0.42 + reflection * 0.48, '--glass-glow-opacity': 0.015 + reflection * 0.12,
-    '--glass-saturation': `${112 + reflection * 58}%`, '--glass-shadow-size': `${12 + reflection * 18}px`,
+    '--glass-edge-opacity': 0.24 + reflection * 0.42, '--glass-glow-opacity': 0.01 + reflection * 0.07,
+    '--glass-saturation': `${82 + reflection * 18}%`, '--glass-shadow-size': `${12 + reflection * 12}px`,
     ...(settings.textColor ? { '--user-ink': settings.textColor } : {})
   } as React.CSSProperties
 
