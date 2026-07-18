@@ -12,9 +12,12 @@ export const DEFAULT_SETTINGS: Settings = {
   backgroundColorA: '#141922',
   backgroundColorB: '#083f59',
   backgroundColorC: '#6a1e4f',
+  backgroundGradientAngle: 145,
+  backgroundGradientSpread: 48,
   glassOpacity: 34,
   glassBlur: 22,
   glassReflection: 82,
+  glassDepth: 78,
   glassTint: '#ffffff',
   textColor: null
 }
@@ -31,4 +34,17 @@ export function hexToRgb(hex: string) {
   const normalized = hex.replace('#', '')
   const value = Number.parseInt(normalized, 16)
   return `${(value >> 16) & 255}, ${(value >> 8) & 255}, ${value & 255}`
+}
+
+export function gradientGeometry(angle: number, spread: number) {
+  const radians = (angle - 90) * Math.PI / 180
+  const x = Math.round(50 + Math.cos(radians) * 39)
+  const y = Math.round(50 + Math.sin(radians) * 39)
+  return {
+    lightX: x,
+    lightY: y,
+    accentX: 100 - x,
+    accentY: 100 - y,
+    radius: Math.max(20, Math.min(80, spread))
+  }
 }

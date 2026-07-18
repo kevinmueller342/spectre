@@ -9,7 +9,7 @@ import {
   Check, ChevronDown, GripVertical, ImagePlus, Languages, MoreHorizontal, Plus,
   RotateCcw, Settings as SettingsIcon, Trash2, X
 } from 'lucide-react'
-import { BACKGROUNDS, DEFAULT_SETTINGS, hexToRgb } from './defaults'
+import { BACKGROUNDS, DEFAULT_SETTINGS, gradientGeometry, hexToRgb } from './defaults'
 import { GlassRenderer } from './GlassRenderer'
 import { getCopy, type Copy } from './i18n'
 import { loadAppData, putSettings, putTasks, removeTask, resizeImage } from './storage'
@@ -164,6 +164,8 @@ function SettingsPanel({ settings, copy, onChange, onClose }: { settings: Settin
   const updatePalette = (key: 'backgroundColorA' | 'backgroundColorB' | 'backgroundColorC', value: string) => onChange({ ...settings, backgroundPreset: 'palette', [key]: value })
   const updateBackgroundMode = (backgroundMode: BackgroundMode) => onChange({ ...settings, backgroundMode, backgroundPreset: 'palette' })
   const fileRef = useRef<HTMLInputElement>(null)
+  const gradient = gradientGeometry(settings.backgroundGradientAngle, settings.backgroundGradientSpread)
+  const palettePreview = `radial-gradient(circle at ${gradient.lightX}% ${gradient.lightY}%, ${settings.backgroundColorB}, transparent ${gradient.radius}%), radial-gradient(circle at ${gradient.accentX}% ${gradient.accentY}%, ${settings.backgroundColorC}, transparent ${gradient.radius}%), ${settings.backgroundColorA}`
   const upload = async (file?: File) => {
     if (!file) return
     try { onChange({ ...settings, customBackground: await resizeImage(file), backgroundPreset: 'custom' }) }
@@ -189,20 +191,21 @@ function SettingsPanel({ settings, copy, onChange, onClose }: { settings: Settin
             </div>
             <div className={`palette-editor${settings.backgroundPreset === 'palette' ? ' selected' : ''}`}>
               <Segmented value={settings.backgroundMode} options={[["gradient", copy.gradient], ["solid", copy.solid]]} onChange={updateBackgroundMode} />
-              <button className="palette-preview" style={{ background: settings.backgroundMode === 'solid' ? settings.backgroundSolidColor : `radial-gradient(circle at 18% 12%, ${settings.backgroundColorB}, transparent 45%), radial-gradient(circle at 82% 82%, ${settings.backgroundColorC}, transparent 48%), ${settings.backgroundColorA}` }} onClick={() => update('backgroundPreset', 'palette')}>
+              <button className="palette-preview" style={{ background: settings.backgroundMode === 'solid' ? settings.backgroundSolidColor : palettePreview }} onClick={() => update('backgroundPreset', 'palette')}>
                 <span>{settings.backgroundMode === 'solid' ? copy.backgroundColor : copy.customColors}</span>
               </button>
-              {settings.backgroundMode === 'solid' ? <label className="solid-color-field"><span>{copy.backgroundColor}</span><input aria-label={copy.backgroundColor} type="color" value={settings.backgroundSolidColor} onChange={(event) => onChange({ ...settings, backgroundPreset: 'palette', backgroundSolidColor: event.target.value })} /></label> : <div className="palette-colors">
+              {settings.backgroundMode === 'solid' ? <label className="solid-color-field"><span>{copy.backgroundColor}</span><input aria-label={copy.backgroundColor} type="color" value={settings.backgroundSolidColor} onChange={(event) => onChange({ ...settings, backgroundPreset: 'palette', backgroundSolidColor: event.target.value })} /></label> : <><div className="palette-colors">
                 <label><span>{copy.colorOne}</span><input aria-label={copy.colorOne} type="color" value={settings.backgroundColorA} onChange={(event) => updatePalette('backgroundColorA', event.target.value)} /></label>
                 <label><span>{copy.colorTwo}</span><input aria-label={copy.colorTwo} type="color" value={settings.backgroundColorB} onChange={(event) => updatePalette('backgroundColorB', event.target.value)} /></label>
                 <label><span>{copy.colorThree}</span><input aria-label={copy.colorThree} type="color" value={settings.backgroundColorC} onChange={(event) => updatePalette('backgroundColorC', event.target.value)} /></label>
-              </div>}
+              </div><label className="range-field"><span>{copy.gradientAngle}<b>{settings.backgroundGradientAngle}°</b></span><input aria-label={copy.gradientAngle} type="range" min="0" max="360" value={settings.backgroundGradientAngle} onChange={(event) => onChange({ ...settings, backgroundPreset: 'palette', backgroundGradientAngle: Number(event.target.value) })} /></label><label className="range-field"><span>{copy.gradientSpread}<b>{settings.backgroundGradientSpread}%</b></span><input aria-label={copy.gradientSpread} type="range" min="20" max="80" value={settings.backgroundGradientSpread} onChange={(event) => onChange({ ...settings, backgroundPreset: 'palette', backgroundGradientSpread: Number(event.target.value) })} /></label></>}
             </div>
           </section>
           <section className="settings-section"><h3>{copy.glass}</h3>
             <label className="range-field"><span>{copy.transparency}<b>{100 - settings.glassOpacity}%</b></span><input aria-label={copy.transparency} type="range" min="10" max="90" value={100 - settings.glassOpacity} onChange={(event) => update('glassOpacity', 100 - Number(event.target.value))} /></label>
             <label className="range-field"><span>{copy.blur}<b>{settings.glassBlur}px</b></span><input type="range" min="6" max="42" value={settings.glassBlur} onChange={(event) => update('glassBlur', Number(event.target.value))} /></label>
             <label className="range-field"><span>{copy.reflection}<b>{settings.glassReflection}%</b></span><input aria-label={copy.reflection} type="range" min="0" max="100" value={settings.glassReflection} onChange={(event) => update('glassReflection', Number(event.target.value))} /></label>
+            <label className="range-field"><span>{copy.depth}<b>{settings.glassDepth}%</b></span><input aria-label={copy.depth} type="range" min="0" max="100" value={settings.glassDepth} onChange={(event) => update('glassDepth', Number(event.target.value))} /></label>
             <label className="color-field"><span>{copy.tint}</span><input type="color" value={settings.glassTint} onChange={(event) => update('glassTint', event.target.value)} /></label>
             <div className="color-field"><span>{copy.textColor}</span><div className="color-actions"><button className={!settings.textColor ? 'active' : ''} onClick={() => update('textColor', null)}>{copy.automatic}</button><input aria-label={copy.textColor} type="color" value={settings.textColor ?? (settings.theme === 'dark' ? '#f5f4f1' : '#171918')} onChange={(event) => update('textColor', event.target.value)} /></div></div>
           </section>
@@ -267,7 +270,8 @@ export default function App() {
 
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 6 } }), useSensor(TouchSensor, { activationConstraint: { delay: 180, tolerance: 8 } }), useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }))
   const sorted = useMemo(() => normalizeOrders(tasks), [tasks])
-  const paletteBackground = `radial-gradient(circle at 15% 8%, ${settings.backgroundColorB} 0, transparent 43%), radial-gradient(circle at 88% 86%, ${settings.backgroundColorC} 0, transparent 48%), linear-gradient(145deg, ${settings.backgroundColorA}, ${settings.backgroundColorA})`
+  const gradient = gradientGeometry(settings.backgroundGradientAngle, settings.backgroundGradientSpread)
+  const paletteBackground = `radial-gradient(circle at ${gradient.lightX}% ${gradient.lightY}%, ${settings.backgroundColorB} 0, transparent ${gradient.radius}%), radial-gradient(circle at ${gradient.accentX}% ${gradient.accentY}%, ${settings.backgroundColorC} 0, transparent ${gradient.radius}%), ${settings.backgroundColorA}`
   const background = settings.backgroundPreset === 'custom' && settings.customBackground
     ? `url(${settings.customBackground}) center / cover`
     : settings.backgroundPreset === 'palette' ? (settings.backgroundMode === 'solid' ? settings.backgroundSolidColor : paletteBackground) : BACKGROUNDS[settings.backgroundPreset as keyof typeof BACKGROUNDS] || BACKGROUNDS.aurora
@@ -279,12 +283,14 @@ export default function App() {
   const surfaceInk = readableInk(settings.glassTint)
   const transparency = (100 - settings.glassOpacity) / 100
   const reflection = settings.glassReflection / 100
+  const depth = settings.glassDepth / 100
   const style = {
     '--app-background': background, '--glass-rgb': hexToRgb(settings.glassTint),
     '--glass-opacity': settings.glassOpacity / 100, '--glass-blur': `${settings.glassBlur}px`,
     '--glass-transparency': transparency, '--glass-refraction': reflection,
-    '--glass-edge-opacity': 0.36 + reflection * 0.38, '--glass-glow-opacity': 0.006 + reflection * 0.028,
-    '--glass-saturation': `${100 + reflection * 20}%`, '--glass-shadow-size': `${16 + reflection * 18}px`,
+    '--glass-depth': depth,
+    '--glass-edge-opacity': 0.22 + reflection * 0.28 + depth * 0.24, '--glass-glow-opacity': 0.004 + reflection * depth * 0.03,
+    '--glass-saturation': `${100 + reflection * 20}%`, '--glass-shadow-size': `${6 + depth * 30}px`,
     '--auto-page-ink': pageInk, '--auto-surface-ink': surfaceInk,
     ...(settings.textColor ? { '--user-ink': settings.textColor } : {})
   } as React.CSSProperties

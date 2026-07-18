@@ -29,9 +29,12 @@ export type Settings = {
   backgroundColorA: string
   backgroundColorB: string
   backgroundColorC: string
+  backgroundGradientAngle: number
+  backgroundGradientSpread: number
   glassOpacity: number
   glassBlur: number
   glassReflection: number
+  glassDepth: number
   glassTint: string
   textColor: string | null
 }

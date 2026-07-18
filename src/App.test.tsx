@@ -73,6 +73,15 @@ describe('Spectre', () => {
     expect(main.style.getPropertyValue('--glass-refraction')).toBe('0.25')
   })
 
+  it('controls the optical 3D depth independently', async () => {
+    const user = userEvent.setup()
+    render(<App />)
+    await screen.findByRole('heading', { name: 'Jetzt erledigen' })
+    await user.click(screen.getByRole('button', { name: 'Einstellungen' }))
+    fireEvent.change(screen.getByLabelText('3D-Tiefe'), { target: { value: '42' } })
+    expect(screen.getByRole('main').style.getPropertyValue('--glass-depth')).toBe('0.42')
+  })
+
   it('builds a background from three custom colors', async () => {
     const user = userEvent.setup()
     render(<App />)
@@ -85,6 +94,18 @@ describe('Spectre', () => {
     expect(background).toContain('#112233')
     expect(background).toContain('#44aacc')
     expect(background).toContain('#bb3366')
+  })
+
+  it('adjusts gradient direction and color spread', async () => {
+    const user = userEvent.setup()
+    render(<App />)
+    await screen.findByRole('heading', { name: 'Jetzt erledigen' })
+    await user.click(screen.getByRole('button', { name: 'Einstellungen' }))
+    fireEvent.change(screen.getByLabelText('Verlaufswinkel'), { target: { value: '90' } })
+    fireEvent.change(screen.getByLabelText('Farbfläche'), { target: { value: '64' } })
+    const background = screen.getByRole('main').style.getPropertyValue('--app-background')
+    expect(background).toContain('89% 50%')
+    expect(background).toContain('transparent 64%')
   })
 
   it('supports a flat background color without a gradient', async () => {

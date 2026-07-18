@@ -10,8 +10,8 @@ const messages = {
     theme: 'Farbschema', system: 'System', light: 'Hell', dark: 'Dunkel', mobileLayout: 'Handy-Layout',
     stack: 'Untereinander', focus: 'Fokus', grid: '2 × 2', background: 'Hintergrund', ownImage: 'Eigenes Bild', customColors: 'Eigene Farben',
     gradient: 'Verlauf', solid: 'Einfarbig', backgroundColor: 'Hintergrundfarbe',
-    colorOne: 'Grundfarbe', colorTwo: 'Lichtfarbe', colorThree: 'Akzentfarbe',
-    glass: 'Glas & Schrift', transparency: 'Transparenz', blur: 'Unschärfe', reflection: 'Glasreflexionen', tint: 'Glastönung', textColor: 'Schriftfarbe', automatic: 'Auto', reset: 'Standard wiederherstellen',
+    colorOne: 'Grundfarbe', colorTwo: 'Lichtfarbe', colorThree: 'Akzentfarbe', gradientAngle: 'Verlaufswinkel', gradientSpread: 'Farbfläche',
+    glass: 'Glas & Schrift', transparency: 'Transparenz', blur: 'Unschärfe', reflection: 'Glasreflexionen', depth: '3D-Tiefe', tint: 'Glastönung', textColor: 'Schriftfarbe', automatic: 'Auto', reset: 'Standard wiederherstellen',
     resetConfirm: 'Alle Design-Einstellungen zurücksetzen?', titleLimit: 'Maximal 160 Zeichen', uploadError: 'Das Bild konnte nicht verarbeitet werden.',
     quadrants: {
       do: ['Jetzt erledigen', 'Wichtig · Dringend'], schedule: ['Einplanen', 'Wichtig · Nicht dringend'],
@@ -27,8 +27,8 @@ const messages = {
     theme: 'Color scheme', system: 'System', light: 'Light', dark: 'Dark', mobileLayout: 'Phone layout',
     stack: 'Stacked', focus: 'Focus', grid: '2 × 2', background: 'Background', ownImage: 'Own image', customColors: 'Custom colors',
     gradient: 'Gradient', solid: 'Solid', backgroundColor: 'Background color',
-    colorOne: 'Base color', colorTwo: 'Light color', colorThree: 'Accent color',
-    glass: 'Glass & type', transparency: 'Transparency', blur: 'Blur', reflection: 'Glass reflections', tint: 'Glass tint', textColor: 'Text color', automatic: 'Auto', reset: 'Restore defaults',
+    colorOne: 'Base color', colorTwo: 'Light color', colorThree: 'Accent color', gradientAngle: 'Gradient angle', gradientSpread: 'Color spread',
+    glass: 'Glass & type', transparency: 'Transparency', blur: 'Blur', reflection: 'Glass reflections', depth: '3D depth', tint: 'Glass tint', textColor: 'Text color', automatic: 'Auto', reset: 'Restore defaults',
     resetConfirm: 'Reset all appearance settings?', titleLimit: 'Maximum 160 characters', uploadError: 'The image could not be processed.',
     quadrants: {
       do: ['Do now', 'Important · Urgent'], schedule: ['Schedule', 'Important · Not urgent'],
