@@ -200,6 +200,17 @@ button:focus-visible, input:focus-visible { outline: 2px solid rgba(56, 82, 79, 
   .toast { bottom: max(84px, calc(env(safe-area-inset-bottom) + 72px)); width: calc(100% - 28px); min-width: 0; }
 }
 
+.optical-glass-canvas { position: fixed; z-index: 0; inset: 0; width: 100%; height: 100%; opacity: 0; pointer-events: none; transition: opacity .18s ease; }
+.optical-glass .optical-glass-canvas { opacity: 1; }
+.app.optical-glass .background { z-index: -3; }
+.app.optical-glass::before { z-index: -2; }
+.optical-glass .app-header, .optical-glass .focus-tabs, .optical-glass .matrix { position: relative; z-index: 1; }
+.optical-glass .quadrant, .optical-glass .task-card, .optical-glass .header-button, .optical-glass .mobile-fab, .optical-glass .focus-tabs, .optical-glass .check-button { border-color: transparent; background: transparent; backdrop-filter: none; -webkit-backdrop-filter: none; box-shadow: none; }
+.optical-glass .quadrant::before, .optical-glass .quadrant::after, .optical-glass .task-card::before, .optical-glass .task-card::after, .optical-glass .header-button::before, .optical-glass .header-button::after, .optical-glass .mobile-fab::before, .optical-glass .mobile-fab::after { content: none; }
+.optical-glass .quadrant, .optical-glass .task-card, .optical-glass .header-button, .optical-glass .mobile-fab { overflow: visible; }
+.optical-glass .task-card, .optical-glass .header-button, .optical-glass .mobile-fab { color: var(--page-ink); }
+.optical-glass .header-button:hover, .optical-glass .task-card:hover { box-shadow: none; transform: none; }
+
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; transition-duration: .01ms !important; }
 }

@@ -10,6 +10,7 @@ import {
   RotateCcw, Settings as SettingsIcon, Trash2, X
 } from 'lucide-react'
 import { BACKGROUNDS, DEFAULT_SETTINGS, hexToRgb } from './defaults'
+import { GlassRenderer } from './GlassRenderer'
 import { getCopy, type Copy } from './i18n'
 import { loadAppData, putSettings, putTasks, removeTask, resizeImage } from './storage'
 import { QUADRANTS, type BackgroundMode, type QuadrantId, type Settings, type Task } from './types'
@@ -217,6 +218,7 @@ export default function App() {
   const [settings, setSettings] = useState(DEFAULT_SETTINGS)
   const [ready, setReady] = useState(false)
   const [settingsOpen, setSettingsOpen] = useState(false)
+  const [opticalGlass, setOpticalGlass] = useState(false)
   const [addOpen, setAddOpen] = useState(false)
   const [focusQuadrant, setFocusQuadrant] = useState<QuadrantId>('do')
   const [activeTask, setActiveTask] = useState<Task | null>(null)
@@ -312,8 +314,9 @@ export default function App() {
 
   if (!ready) return <main className="loading" style={style}><div className="loading-mark" /></main>
   return (
-    <main className={`app mobile-${settings.mobileLayout}`} style={style}>
+    <main className={`app mobile-${settings.mobileLayout}${opticalGlass ? ' optical-glass' : ''}`} style={style}>
       <div className="background" />
+      <GlassRenderer settings={settings} onReady={setOpticalGlass} />
       <header className="app-header">
         <div className="brand">{settings.showAppName && <h1>{settings.appName || 'Spectre'}</h1>}<p>{copy.taskCount(tasks.length)}</p></div>
         <div className="header-actions">
